@@ -13,7 +13,7 @@
     <main>
         <div class="titelandbutton">
             <h2>Games</h2>
-            <button class="button-game">+ Game toevoegen</button>
+            <a href="create.php" class="button-game">+ Game toevoegen</a>
         </div>
         <div class="categorie-titles">
             <div class="categorie-filter">

@@ -3,3 +3,7 @@ CREATE DATABASE IF NOT EXISTS gamespark
   COLLATE utf8mb4_unicode_ci;
 
 USE gamespark;
+
+CREATE TABLE IF NOT EXISTS informatie (
+    
+)

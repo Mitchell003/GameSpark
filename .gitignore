@@ -1,1 +1,3 @@
-/app
+/app/config.php
+/app/config.example.php
+/app/conn.php
