@@ -1,3 +1,3 @@
-<footer class="site-footer">
-    <p>GameSpark &mdash; jouw persoonlijke gameoverzicht</p>
+<footer>
+    <p>hi</p>
 </footer>
