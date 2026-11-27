@@ -1,14 +1,17 @@
+/* Haal standaard browsermarges en binnenruimte weg. */
 * {
     margin: 0;
     padding: 0;
 }
 
+/* Basisstijl voor alle links. */
 a {
     text-decoration: none;
     color: white;
     font-size: 50px;
 }
 
+/* Geef links een achtergrond en rand wanneer de muis erop staat. */
 a:hover {
     transition: 0.30s;
     border: 2px solid white;
@@ -17,6 +20,7 @@ a:hover {
     background-color: #202132;
 }
 
+/* Plaats de onderdelen van de sitekop naast elkaar en houd de kop bovenaan zichtbaar. */
 header {
     background-color: #10111a;
     display: flex;
@@ -28,6 +32,7 @@ header {
     top: 0;
 }
 
+/* Zet de navigatielinks naast elkaar aan de rechterkant van de sitekop. */
 header nav {
     display: flex;
     align-items: center;
@@ -35,33 +40,38 @@ header nav {
     margin-left: auto;
 }
 
+/* Geef ruimte tussen het navigatiemenu en het profielicoon. */
 .person-icon {
     margin-left: 40px;
 }
 
+/* Achtergrondkleur van het hoofdgedeelte van de pagina. */
 main {
     background-color: #a7a8bc;
     min-height: 70vh;
     padding: 20px 30px 40px;
 }
 
-/* Filter is tijdelijk, mag wanneer de echte foto beschikbaar is werk */
+/* Maak het tijdelijke logo licht zodat het zichtbaar is op de donkere sitekop. */
 .logo img{
     width: 80px;
     height: auto;
     filter: brightness(0) invert(1); 
 }
 
+/* Stel de grootte van het profielicoon in. */
 .person-icon img{
     width: 45px;
     height: auto;
 }
 
+/* Stijl voor de GameSpark-titel in de sitekop. */
 .title-1{
     color:white;
     font-size: 50px;
 }
 
+/* Stijl voor de knop/link om een game toe te voegen. */
 .button-game{
     border: 4px solid #5A67D8 ;
     background-color: #5A67D8 ;
@@ -72,12 +82,13 @@ main {
     cursor: pointer;
 }
 
-
+/* Algemene stijl voor koppen van niveau 2. */
 h2{
     color: white;
     font-size: 50px;
 }
 
+/* Toon de categorie- en filtervelden in een raster. */
 .categorie-titles{
     font-size: 18px;
     color: white;
@@ -91,6 +102,7 @@ h2{
     margin: 0 30px;
 }
 
+/* Zet ieder filterlabel boven het bijbehorende keuzemenu. */
 .categorie-filter {
     display: flex;
     flex-direction: column;
@@ -101,6 +113,7 @@ h2{
     font-size: 18px;
 }
 
+/* Beperk de breedte van de filterkeuzemenu's. */
 .categorie-filter select,
 .categorie-filter input {
     width: 100%;
@@ -144,6 +157,7 @@ h2{
     font-size: 16px;
 }
 
+/* Plaats de paginatitel en de knop naast elkaar met tussenruimte. */
 .titelandbutton{
     display: flex;
     align-items: center;
@@ -248,72 +262,41 @@ h2{
     overflow-x: auto;
 }
 
+/* Toon de opgeslagen games overzichtelijk, inclusief hun coverafbeeldingen. */
 .games-table {
-    width: 100%;
+    width: calc(100% - 60px);
+    margin: 20px 30px;
     border-collapse: collapse;
-    background-color: #202132;
-    color: white;
-    text-align: left;
+    background-color: white;
+    color: #10111a;
+    font-size: 20px;
 }
 
 .games-table th,
 .games-table td {
-    padding: 12px 14px;
-    border-bottom: 1px solid #45465a;
+    padding: 12px;
+    border-bottom: 1px solid #d5d6df;
+    text-align: left;
 }
 
 .games-table th {
-    background-color: #34364f;
+    background-color: #202132;
+    color: white;
 }
 
-.empty-games {
+.games-table .game-image {
+    display: block;
+    width: 90px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.games-table a {
+    color: #202132;
     font-size: 18px;
 }
 
-@media (max-width: 800px) {
-    .categorie-titles {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        font-size: 18px;
-    }
-
-    .button-game {
-        font-size: 28px;
-    }
-}
-
-@media (max-width: 520px) {
-    main {
-        padding: 12px;
-    }
-
-    .titelandbutton {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 15px;
-    }
-
-    .categorie-titles {
-        grid-template-columns: 1fr;
-        gap: 16px;
-        padding: 15px 0;
-    }
-
-    .filters-form {
-        margin: 0 15px;
-    }
-
-    .game-form {
-        right: auto;
-        left: 0;
-        width: calc(100vw - 48px);
-        padding: 18px;
-    }
-
-    .game-form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .game-list {
-        margin: 24px 15px;
-    }
+.empty-games {
+    padding: 20px 30px;
+    font-size: 22px;
 }
