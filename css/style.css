@@ -41,6 +41,8 @@ header nav {
 
 main {
     background-color: #a7a8bc;
+    min-height: 70vh;
+    padding: 20px 30px 40px;
 }
 
 /* Filter is tijdelijk, mag wanneer de echte foto beschikbaar is werk */
@@ -67,6 +69,7 @@ main {
     padding: 5px 5px 5px 5px;
     font-size: 40px;
     color: white;
+    cursor: pointer;
 }
 
 
@@ -76,12 +79,16 @@ h2{
 }
 
 .categorie-titles{
-    font-size: 40px;
+    font-size: 18px;
     color: white;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
-    padding: 15px 30px 15px 30px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 18px;
+    padding: 15px 0;
+}
+
+.filters-form {
+    margin: 0 30px;
 }
 
 .categorie-filter {
@@ -90,13 +97,223 @@ h2{
     gap: 8px;
 }
 
-.categorie-filter select {
+.categorie-filter label {
+    font-size: 18px;
+}
+
+.categorie-filter select,
+.categorie-filter input {
     width: 100%;
-    max-width: 220px;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #77798f;
+    border-radius: 6px;
+    background-color: #202132;
+    color: white;
+    font: inherit;
+}
+
+.filter-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.filter-actions button {
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 8px;
+    background-color: #5A67D8;
+    color: white;
+    cursor: pointer;
+    font: inherit;
+}
+
+.filter-actions a {
+    color: #202132;
+    font-size: 16px;
+}
+
+.filter-actions a:hover {
+    text-decoration: underline;
+}
+
+.results-count {
+    margin-bottom: 12px;
+    font-size: 16px;
 }
 
 .titelandbutton{
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 20px;
     padding: 15px 30px 15px 30px;
+}
+
+.add-game {
+    position: relative;
+}
+
+.add-game summary {
+    list-style: none;
+}
+
+.add-game summary::-webkit-details-marker {
+    display: none;
+}
+
+.game-form {
+    position: absolute;
+    z-index: 2;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(90vw, 680px);
+    padding: 24px;
+    border: 1px solid #5A67D8;
+    border-radius: 12px;
+    background-color: #202132;
+    color: white;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.game-form h3 {
+    margin-bottom: 18px;
+    font-size: 24px;
+}
+
+.game-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.game-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.game-form-field label {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.game-form-field input,
+.game-form-field select {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #77798f;
+    border-radius: 6px;
+    background-color: #10111a;
+    color: white;
+    font: inherit;
+}
+
+.game-form-field [aria-invalid="true"] {
+    border-color: #ff777f;
+}
+
+.error {
+    color: #ff9298;
+    font-size: 14px;
+}
+
+.save-game-button {
+    margin-top: 20px;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 8px;
+    background-color: #5A67D8;
+    color: white;
+    cursor: pointer;
+    font: inherit;
+    font-size: 18px;
+}
+
+.game-list {
+    margin: 30px;
+    color: #202132;
+}
+
+.game-list h2 {
+    margin-bottom: 16px;
+    color: #202132;
+    font-size: 32px;
+}
+
+.games-table-wrap {
+    overflow-x: auto;
+}
+
+.games-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #202132;
+    color: white;
+    text-align: left;
+}
+
+.games-table th,
+.games-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #45465a;
+}
+
+.games-table th {
+    background-color: #34364f;
+}
+
+.empty-games {
+    font-size: 18px;
+}
+
+@media (max-width: 800px) {
+    .categorie-titles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        font-size: 18px;
+    }
+
+    .button-game {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 520px) {
+    main {
+        padding: 12px;
+    }
+
+    .titelandbutton {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .categorie-titles {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 15px 0;
+    }
+
+    .filters-form {
+        margin: 0 15px;
+    }
+
+    .game-form {
+        right: auto;
+        left: 0;
+        width: calc(100vw - 48px);
+        padding: 18px;
+    }
+
+    .game-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .game-list {
+        margin: 24px 15px;
+    }
 }
