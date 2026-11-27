@@ -16,3 +16,20 @@ CREATE TABLE IF NOT EXISTS informatie (
     status ENUM('wishlist', 'inbezit', 'speeltnu', 'uitgespeeld') NOT NULL,
     beoordeling VARCHAR(280) NOT NULL
 );
+
+-- Voeg de unieke sleutel ook toe aan bestaande installaties wanneer deze nog ontbreekt.
+SET @game_key_exists = (
+    SELECT COUNT(*)
+    FROM information_schema.statistics
+    WHERE table_schema = DATABASE()
+      AND table_name = 'informatie'
+      AND index_name = 'uq_informatie_naam_releasejaar'
+);
+SET @game_key_sql = IF(
+    @game_key_exists = 0,
+    'ALTER TABLE informatie ADD UNIQUE KEY uq_informatie_naam_releasejaar (naam, releasejaar)',
+    'SELECT 1'
+);
+PREPARE add_game_key FROM @game_key_sql;
+EXECUTE add_game_key;
+DEALLOCATE PREPARE add_game_key;

@@ -71,19 +71,43 @@ if ($errors !== []) {
 
 require_once __DIR__ . '/../../conn.php';
 
+$duplicateStatement = $conn->prepare(
+    'SELECT 1 FROM informatie WHERE naam = :naam AND releasejaar = :releasejaar LIMIT 1'
+);
+$duplicateStatement->execute([
+    ':naam' => $gegevens['naam'],
+    ':releasejaar' => (string) $releasejaar,
+]);
+
+if ($duplicateStatement->fetchColumn() !== false) {
+    http_response_code(409);
+    echo '<h1>Game bestaat al</h1><p>Deze game met dit releasejaar is al opgeslagen.</p>';
+    exit;
+}
+
 $query = 'INSERT INTO informatie
     (naam, afbeelding, platform, genre, releasejaar, status, beoordeling)
     VALUES (:naam, :afbeelding, :platform, :genre, :releasejaar, :status, :beoordeling)';
 $statement = $conn->prepare($query);
-$statement->execute([
-    ':naam' => $gegevens['naam'],
-    ':afbeelding' => $gegevens['afbeelding'],
-    ':platform' => $gegevens['platform'],
-    ':genre' => $gegevens['genre'],
-    ':releasejaar' => (string) $releasejaar,
-    ':status' => $gegevens['status'],
-    ':beoordeling' => (string) $beoordeling,
-]);
+try {
+    $statement->execute([
+        ':naam' => $gegevens['naam'],
+        ':afbeelding' => $gegevens['afbeelding'],
+        ':platform' => $gegevens['platform'],
+        ':genre' => $gegevens['genre'],
+        ':releasejaar' => (string) $releasejaar,
+        ':status' => $gegevens['status'],
+        ':beoordeling' => (string) $beoordeling,
+    ]);
+} catch (PDOException $exception) {
+    if ($exception->getCode() !== '23000') {
+        throw $exception;
+    }
+
+    http_response_code(409);
+    echo '<h1>Game bestaat al</h1><p>Deze game met dit releasejaar is al opgeslagen.</p>';
+    exit;
+}
 
 header('Location: ../../../public_html/informatie/index.php');
 exit;

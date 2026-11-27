@@ -2,10 +2,74 @@
 
 require_once __DIR__ . '/../../app/conn.php';
 
-$query = 'SELECT * FROM informatie ORDER BY beoordeling DESC';
+$filterOpties = [
+    'platform' => ['pc', 'playstation', 'xbox', 'nintendo'],
+    'genre' => ['action', 'adventure', 'rpg', 'strategy', 'horror'],
+    'status' => ['wishlist', 'inbezit', 'speeltnu', 'uitgespeeld'],
+    'beoordeling' => ['1', '2', '3', '4', '5'],
+];
+$filterNamen = [
+    'platform' => [
+        'pc' => 'PC',
+        'playstation' => 'Playstation',
+        'xbox' => 'Xbox',
+        'nintendo' => 'Nintendo',
+    ],
+    'genre' => [
+        'action' => 'Actie',
+        'adventure' => 'Avontuur',
+        'rpg' => 'RPG',
+        'strategy' => 'Strategie',
+        'horror' => 'Horror',
+    ],
+    'status' => [
+        'wishlist' => 'Wishlist',
+        'inbezit' => 'In bezit',
+        'speeltnu' => 'Speelt nu',
+        'uitgespeeld' => 'Uitgespeeld',
+    ],
+];
+$filters = [];
+$filterError = '';
+$where = [];
+$parameters = [];
+
+foreach ($filterOpties as $veld => $opties) {
+    $waarde = $_GET[$veld] ?? '';
+    if (!is_string($waarde)) {
+        $waarde = '';
+    }
+
+    if ($waarde !== '' && !in_array($waarde, $opties, true)) {
+        $waarde = '';
+        $filterError = 'Ongeldige filters zijn genegeerd.';
+    }
+
+    $filters[$veld] = $waarde;
+    if ($waarde !== '') {
+        $where[] = $veld . ' = :' . $veld;
+        $parameters[':' . $veld] = $waarde;
+    }
+}
+
+$query = 'SELECT * FROM informatie';
+if ($where !== []) {
+    $query .= ' WHERE ' . implode(' AND ', $where);
+}
+$query .= ' ORDER BY beoordeling DESC';
 $statement = $conn->prepare($query);
-$statement->execute();
+$statement->execute($parameters);
 $informatie = $statement->fetchAll();
+$totaalStatement = $conn->query('SELECT COUNT(*) FROM informatie');
+$totaalGames = (int) $totaalStatement->fetchColumn();
+$heeftFilter = in_array(true, array_map(static function (string $waarde): bool {
+    return $waarde !== '';
+}, $filters), true);
+
+function escape(string $waarde): string
+{
+    return htmlspecialchars($waarde, ENT_QUOTES, 'UTF-8');
+}
 ?>
 
 <!DOCTYPE html>
@@ -28,58 +92,76 @@ $informatie = $statement->fetchAll();
             <h2>Games</h2>
             <a href="create.php" class="button-game">+ Game toevoegen</a>
         </div>
-        <!-- Keuzevelden voor de beschikbare gamefilters; ze zijn hier nog niet aan filterlogica gekoppeld. -->
-        <div class="categorie-titles">
-            <!-- Filterkeuze op gameplatform. -->
-            <div class="categorie-filter">
-                <label for="platform">Platform</label>
-                <select name="platform" id="platform">
-                    <option value="all">Alle platforms</option>
-                    <option value="pc">PC</option>
-                    <option value="playstation">Playstation</option>
-                    <option value="xbox">Xbox</option>
-                    <option value="nintendo">Nintendo</option>
-                </select>
+        <form class="filters-form" method="get" action="index.php">
+            <div class="categorie-titles">
+                <div class="categorie-filter">
+                    <label for="platform">Platform</label>
+                    <select name="platform" id="platform">
+                        <option value="">Alle platforms</option>
+                        <?php foreach ($filterOpties['platform'] as $optie): ?>
+                            <option value="<?= escape($optie) ?>" <?= $filters['platform'] === $optie ? 'selected' : '' ?>>
+                                <?= escape($filterNamen['platform'][$optie]) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="categorie-filter">
+                    <label for="genre">Genre</label>
+                    <select name="genre" id="genre">
+                        <option value="">Alle genres</option>
+                        <?php foreach ($filterOpties['genre'] as $optie): ?>
+                            <option value="<?= escape($optie) ?>" <?= $filters['genre'] === $optie ? 'selected' : '' ?>>
+                                <?= escape($filterNamen['genre'][$optie]) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="categorie-filter">
+                    <label for="status">Status</label>
+                    <select name="status" id="status">
+                        <option value="">Alle statussen</option>
+                        <?php foreach ($filterOpties['status'] as $optie): ?>
+                            <option value="<?= escape($optie) ?>" <?= $filters['status'] === $optie ? 'selected' : '' ?>>
+                                <?= escape($filterNamen['status'][$optie]) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="categorie-filter">
+                    <label for="beoordeling">Beoordeling</label>
+                    <select name="beoordeling" id="beoordeling">
+                        <option value="">Alle scores</option>
+                        <?php foreach ($filterOpties['beoordeling'] as $optie): ?>
+                            <option value="<?= escape($optie) ?>" <?= $filters['beoordeling'] === $optie ? 'selected' : '' ?>>
+                                <?= escape($optie) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
-            <!-- Filterkeuze op gamegenre. -->
-            <div class="categorie-filter">
-                <label for="genre">Genre</label>
-                <select name="genre" id="genre">
-                    <option value="all">Alle genres</option>
-                    <option value="action">Action</option>
-                    <option value="adventure">Adventure</option>
-                    <option value="rpg">RPG</option>
-                    <option value="strategy">Strategy</option>
-                    <option value="horror">Horror</option>
-                </select>
+            <div class="filter-actions">
+                <button type="submit">Filter</button>
+                <?php if ($heeftFilter): ?>
+                    <a href="index.php">Wis filters</a>
+                <?php endif; ?>
             </div>
-            <!-- Filterkeuze op de status van de game. -->
-            <div class="categorie-filter">
-                <label for="status">Status</label>
-                <select name="status" id="status">
-                    <option value="all">Alle statussen</option>
-                    <option value="wishlist">Wishlist</option>
-                    <option value="inbezit">In bezit</option>
-                    <option value="speeltnu">Speelt nu</option>
-                    <option value="uitgespeeld">Uitgespeeld</option>
-                </select>
-            </div>
-            <!-- Filterkeuze op beoordeling, van 1 tot en met 5. -->
-            <div class="categorie-filter">
-                <label for="beoordeling">Beoordeling</label>
-                <select name="beoordeling" id="beoordeling">
-                    <option value="all">Alle scores</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-        </div>
+        </form>
 
-<?php if ($informatie === []): ?>
+        <?php if ($filterError !== ''): ?>
+            <p class="error" role="alert"><?= escape($filterError) ?></p>
+        <?php endif; ?>
+        <p class="results-count">
+            <?php if ($heeftFilter): ?>
+                <?= count($informatie) ?> van <?= $totaalGames ?> games
+            <?php else: ?>
+                <?= $totaalGames ?> games
+            <?php endif; ?>
+        </p>
+
+<?php if ($informatie === [] && $totaalGames === 0): ?>
     <p class="empty-games">Er zijn nog geen games toegevoegd.</p>
+<?php elseif ($informatie === []): ?>
+    <p class="empty-games">Geen games gevonden met deze filters.</p>
 <?php else: ?>
     <table class="games-table">
         <thead>
@@ -105,10 +187,10 @@ $informatie = $statement->fetchAll();
                         >
                     </td>
                     <td><?= htmlspecialchars($game['naam'], ENT_QUOTES, 'UTF-8') ?></td>
-                    <td><?= htmlspecialchars($platformNamen[$game['platform']] ?? $game['platform'], ENT_QUOTES, 'UTF-8') ?></td>
-                    <td><?= htmlspecialchars($genreNamen[$game['genre']] ?? $game['genre'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= escape($filterNamen['platform'][$game['platform']] ?? $game['platform']) ?></td>
+                    <td><?= escape($filterNamen['genre'][$game['genre']] ?? $game['genre']) ?></td>
                     <td><?= htmlspecialchars($game['releasejaar'], ENT_QUOTES, 'UTF-8') ?></td>
-                    <td><?= htmlspecialchars($statusNamen[$game['status']] ?? $game['status'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= escape($filterNamen['status'][$game['status']] ?? $game['status']) ?></td>
                     <td><?= htmlspecialchars($game['beoordeling'], ENT_QUOTES, 'UTF-8') ?>/5</td>
                     <td><a href="edit.php?id=<?= (int) $game['id'] ?>">Aanpassen</a></td>
                 </tr>
